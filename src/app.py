@@ -26,14 +26,41 @@ def sitemap():
     return generate_sitemap(app)
 
 
-@app.route('/members', methods=['GET'])
-def handle_hello():
-    # This is how you can use the Family datastructure by calling its methods
-    members = jackson_family.get_all_members()
-    response_body = {"hello": "world",
-                     "family": members}
-    return jsonify(response_body), 200
+@app.route('/members', methods=['GET', 'POST'])
+def members():
+    response_body = {}
+    if request.method == 'GET':
+        members = jackson_family.get_all_members()
+        response_body['message'] ="Listado de los integrantes de la familia"
+        response_body["results"] = members         
+        return response_body, 200
+    if request.method == 'POST':
+        data = request.json
+        jackson_family.add_member(data)
+        response_body['results'] = jackson_family.get_all_members()
+        response_body['message'] = 'Respuesta desde el POST de /members'
+        return response_body, 200
 
+
+@app.route('/members/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+def member(id):
+    response_body = {}
+    if not jackson_family.get_member(id):
+        response_body['message'] = f'No existe usuario {id}'
+        response_body['results'] = []
+        return response_body, 400
+    if request.method == 'GET':
+        response_body['message'] = f'Respuesta desde el GET para el usuario {id}'
+        response_body['results'] = jackson_family.get_member(id)
+        return response_body, 200
+    if request.method == 'PUT':
+        response_body['message'] = f'Respuesta desde el PUT para el usuario {id}'
+        response_body['results'] = jackson_family.get_member(id)
+        return response_body, 200
+    if request.method == 'DELETE':
+        response_body['message'] = f'Respuesta desde el DELETE para el usuario {id}'
+        response_body['results'] = jackson_family.get_member(id)
+        return response_body, 200
 
 # This only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
