@@ -45,10 +45,6 @@ def members():
 @app.route('/members/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 def member(id):
     response_body = {}
-    if not jackson_family.get_member(id):
-        response_body['message'] = f'No existe usuario {id}'
-        response_body['results'] = []
-        return response_body, 400
     if request.method == 'GET':
         response_body['message'] = f'Respuesta desde el GET para el usuario {id}'
         response_body['results'] = jackson_family.get_member(id)
